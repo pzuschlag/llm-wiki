@@ -1,0 +1,27 @@
+# Instanz-Konfiguration für .llm-wiki/lint_wiki.py — gehört der Instanz.
+# Format: einfaches YAML (key: value, key: [a, b], eine Ebene Einrückung für Mappings).
+
+# Erlaubte Seitentypen (`type:` im Frontmatter)
+page_types: [area, person, project, product, decision, concept, source-summary, draft, meta, template]
+
+# Review-Intervall in Tagen je Typ: review_by = last_updated + Intervall
+review_days:
+  person: 60
+  project: 45
+  area: 45
+  product: 90
+  concept: 180
+  decision: 180
+  meta: 30
+  draft: 30
+  source-summary: 365
+  template: 365
+
+# Zusätzliche Quellen-Präfixe (`<präfix>:<wert>`) neben den Kern-Präfixen
+source_prefixes: [{{ extra_source_prefixes }}]
+
+# Seiten ohne Frontmatter und außerhalb des Index
+meta_pages: [index.md, log.md]
+
+# Seiten, die keine eingehenden Links brauchen
+orphan_exempt: [backlog.md, overview.md]

@@ -1,0 +1,51 @@
+# Copier-Vorlage für eine LLM-Wiki-Instanz — siehe README.md und CONCEPT.md §6
+_subdirectory: template
+_min_copier_version: "9.0.0"
+_answers_file: .copier-answers.yml
+
+# Instanz-Eigentum: nur beim ersten copy anlegen, bei update nie überschreiben
+_skip_if_exists:
+  - CLAUDE.md
+  - wiki.config.yaml
+  - .gitignore
+  - wiki/index.md
+  - wiki/log.md
+  - wiki/overview.md
+
+# Datenmigrationen je Konzept-Version (laufen bei `copier update`, wenn die Version übersprungen wird).
+# Beispiel:
+#   - version: v1.0.0
+#     when: "{{ _stage == 'after' }}"
+#     command: python3 .llm-wiki/migrations/0001_beispiel.py
+_migrations: []
+
+wiki_name:
+  type: str
+  help: "Name des Wikis (z. B. 'Arbeits-Wiki', 'Privat-Wiki', 'Projekt X')"
+
+wiki_purpose:
+  type: str
+  help: "Zweck in einem Satz — wessen Wissen, wofür?"
+
+owner_name:
+  type: str
+  help: "Dein Name (für Commits und CLAUDE.md)"
+
+git_email:
+  type: str
+  help: "E-Mail für Commits in diesem Wiki"
+
+language:
+  type: str
+  choices: [de, en]
+  default: de
+
+extra_source_prefixes:
+  type: str
+  default: ""
+  help: "Zusätzliche Quellen-Präfixe, kommagetrennt (z. B. 'confluence, jira, notion'). Kern-Präfixe raw/ wiki/ scripts/ url: meeting: note: sind immer dabei."
+
+sensitive_data_note:
+  type: str
+  default: "raw/ bleibt lokal (gitignored)."
+  help: "Was darf nicht ins Repo / ins Wiki? (Compliance-Hinweis für CLAUDE.md)"
