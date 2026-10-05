@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 """
-Verwaltet von pzuschlag/llm-wiki.
+Managed by pzuschlag/llm-wiki.
 
-PostToolUse-Hook (siehe .claude/settings.json): zählt Read/Grep-Zugriffe auf
-wiki/** während einer Aufgabe (nicht nur am Session-Start) und hängt sie an
-.llm-wiki/.stats.jsonl an (lokal, gitignored). Auswertung: `lint_wiki.py --stats`,
-eingebunden in den Skill wiki-lint. Blockiert nie — Fehler werden verschluckt.
+PostToolUse hook (see .claude/settings.json): counts Read/Grep access to
+wiki/** during a task (not just at session start) and appends it to
+.llm-wiki/.stats.jsonl (local, gitignored). Evaluation: `lint_wiki.py --stats`,
+wired into the wiki-lint skill. Never blocks — errors are swallowed.
 """
 from __future__ import annotations
 
@@ -32,7 +32,7 @@ def main() -> int:
     raw_path = tool_input.get("file_path") or tool_input.get("path") or ""
     path = str(raw_path).replace("\\", "/")
     if "/wiki/" not in f"/{path.lstrip('/')}":
-        return 0  # kein Pfad oder nicht unter wiki/ (z. B. Grep ohne path)
+        return 0  # no path, or not under wiki/ (e.g. Grep without a path)
 
     entry = {
         "ts": datetime.datetime.now().isoformat(timespec="seconds"),

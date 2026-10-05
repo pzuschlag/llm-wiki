@@ -1,57 +1,59 @@
 # llm-wiki
 
-Ein Konzept für LLM-gepflegte Wikis, aufbauend auf [Karpathys LLM-Wiki-Pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f), plus eine Vorlage, um es in einzelnen Wikis anzuwenden und aktuell zu halten.
+A concept for LLM-maintained wikis, building on [Karpathy's LLM-wiki pattern](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f), plus a template to apply it to individual wikis and keep them up to date.
 
-> **Status: v0.x, experimentell.** Ideen und Erfahrungsberichte gern als Issue.
+The idea: instead of re-deriving knowledge from raw sources on every question, an LLM *compiles* it once into a persistent, cross-linked Markdown wiki — with sources, a review lifecycle, and a lint that mechanically enforces the schema.
 
-- **[CONCEPT.md](CONCEPT.md)** — das Konzept: Prinzipien, Schema, Workflows, Verteilung, Skalierung
-- **[CHANGELOG.md](CHANGELOG.md)** — Versionen des Konzepts
-- **[decisions/](decisions/)** — Entscheidungen zum Konzept (ADRs)
-- **[research/](research/)** — Quellen und Beobachtungen, aus denen das Konzept lernt
-- **[template/](template/)** — [Copier](https://copier.readthedocs.io/)-Vorlage einer Wiki-Instanz
+> **Status: v0.x, experimental.** Ideas and experience reports are welcome as issues.
 
-Dieses Repo enthält keine Wiki-Inhalte. Jede Instanz ist ein eigenes Repo.
+- **[CONCEPT.md](CONCEPT.md)** — the concept: principles, schema, workflows, distribution, scaling
+- **[CHANGELOG.md](CHANGELOG.md)** — versions of the concept
+- **[decisions/](decisions/)** — decisions on the concept (ADRs)
+- **[research/](research/)** — sources and observations the concept learns from
+- **[template/](template/)** — [Copier](https://copier.readthedocs.io/) template for a wiki instance
 
-## Neue Wiki-Instanz anlegen
+This repo contains no wiki content. Every instance is its own repo.
+
+## Create a new wiki instance
 
 ```bash
-pipx install copier            # einmalig
-copier copy gh:pzuschlag/llm-wiki ~/repos/mein-wiki
-cd ~/repos/mein-wiki
+pipx install copier            # once
+copier copy gh:pzuschlag/llm-wiki ~/repos/my-wiki
+cd ~/repos/my-wiki
 git init && git config core.hooksPath .llm-wiki/hooks
-git add -A && git commit -m "wiki: init aus llm-wiki"
+git add -A && git commit -m "wiki: init from llm-wiki"
 ```
 
-Copier fragt Name, Zweck, Sprache und domänenspezifische Quellen-Präfixe ab und schreibt die Antworten nach `.copier-answers.yml`.
+Copier asks for the name, purpose, language, and domain-specific source prefixes, and writes the answers to `.copier-answers.yml`.
 
-## Instanz auf neue Konzept-Version heben
+## Lift an instance to a new concept version
 
-In der Instanz den Skill **`wiki-upgrade`** ausführen, oder von Hand:
+Run the **`wiki-upgrade`** skill in the instance, or by hand:
 
 ```bash
 git checkout -b llm-wiki-upgrade
-copier update --skip-answered     # 3-Wege-Merge + Migrationen der übersprungenen Versionen
+copier update --skip-answered     # 3-way merge + migrations for the skipped versions
 python3 .llm-wiki/lint_wiki.py
-# Konflikte (Konfliktmarker) lösen, committen, Pull Request
+# resolve conflicts (conflict markers), commit, pull request
 ```
 
-## Was gehört wem
+## Who owns what
 
-| Verwaltet vom Konzept (in Instanzen nicht von Hand ändern) | Gehört der Instanz |
+| Managed by the concept (never change by hand in instances) | Belongs to the instance |
 |---|---|
 | `.llm-wiki/` (CORE.md, lint_wiki.py, log_wiki_access.py, hooks/, migrations/) | `CLAUDE.md`, `wiki.config.yaml` |
-| `.claude/skills/wiki-*`, `.claude/settings.json` | `wiki/`, `raw/`, `scripts/`, eigene Skills |
+| `.claude/skills/wiki-*`, `.claude/settings.json` | `wiki/`, `raw/`, `scripts/`, your own skills |
 
-Verbesserungsideen aus einer Instanz → Issue in diesem Repo, nicht lokal in `.llm-wiki/` ändern.
+Improvement ideas from an instance → an issue in this repo, not a local change under `.llm-wiki/`.
 
-## Neue Konzept-Version veröffentlichen
+## Publish a new concept version
 
-1. Änderung im Template (+ Migrationsskript unter `template/.llm-wiki/migrations/` und Eintrag in `copier.yml` → `_migrations`, falls Daten betroffen) und in `CONCEPT.md`
-2. `CHANGELOG.md` ergänzen, Version in `template/.llm-wiki/CORE.md` und `CONCEPT.md` anheben
-3. `tests/test_template.sh` ausführen
-4. Merge, dann Tag `vX.Y.Z` — Copier nutzt Git-Tags als Versionen
+1. Change the template (+ a migration script under `template/.llm-wiki/migrations/` and an entry in `copier.yml` → `_migrations`, if data is affected) and `CONCEPT.md`
+2. Add to `CHANGELOG.md`, bump the version in `template/.llm-wiki/CORE.md` and `CONCEPT.md`
+3. Run `tests/test_template.sh`
+4. Merge, then tag `vX.Y.Z` — Copier uses git tags as versions
 
-## Lizenz
+## License
 
-- Vorlage, Skripte und Tests (`template/`, `tests/`, `copier.yml`): [MIT](LICENSE)
-- Konzept und Dokumentation (`CONCEPT.md`, `decisions/`, `research/`, `CHANGELOG.md`): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.de) — Weiterverwendung mit Namensnennung
+- Template, scripts, and tests (`template/`, `tests/`, `copier.yml`): [MIT](LICENSE)
+- Concept and documentation (`CONCEPT.md`, `decisions/`, `research/`, `CHANGELOG.md`): [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — reuse with attribution

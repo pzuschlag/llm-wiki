@@ -2,23 +2,23 @@
 
 @.llm-wiki/CORE.md
 
-## Zweck
+## Purpose
 {{ wiki_purpose }}
 
-Das LLM schreibt und pflegt alle Wiki-Seiten. {{ owner_name.split(' ')[0] }} kümmert sich ums Sourcing und stellt die richtigen Fragen.
+The LLM writes and maintains all wiki pages. {{ owner_name.split(' ')[0] }} handles sourcing and asks the right questions.
 
-## Datenschutz
+## Data protection
 {{ sensitive_data_note }}
 
-## Quellen dieser Instanz
-<!-- Welche Systeme liefern Rohquellen, wie kommen sie nach raw/? Präfixe in wiki.config.yaml → source_prefixes. -->
+## Sources for this instance
+<!-- Which systems provide raw sources, how do they land in raw/? Prefixes in wiki.config.yaml → source_prefixes. -->
 
-## Session-Start
-1. Instanz-Syncs ausführen (eigene Skills unter `.claude/skills/`, falls vorhanden)
-2. `python3 .llm-wiki/lint_wiki.py --stale` → überfällige Seiten melden, Auffrischen anbieten
+## Session start
+1. Run instance syncs (own skills under `.claude/skills/`, if any)
+2. `python3 .llm-wiki/lint_wiki.py --stale` → report overdue pages, offer to refresh
 
 ## Git
 ```bash
-git -c user.name="{{ owner_name }}" -c user.email="{{ git_email }}" commit -m "wiki: <typ> <beschreibung>"
+git -c user.name="{{ owner_name }}" -c user.email="{{ git_email }}" commit -m "wiki: <type> <description>"
 ```
-Inhaltliche Wiki-Änderungen: committen und pushen. Strukturelle Änderungen (Schema, Skripte, CLAUDE.md): Branch + Pull Request.
+Content changes to the wiki: commit and push. Structural changes (schema, scripts, CLAUDE.md): branch + pull request.

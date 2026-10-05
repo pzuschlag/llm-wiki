@@ -1,36 +1,36 @@
 #!/usr/bin/env python3
 """
-Wiki Lint — Qualitätscheck für LLM-Wiki-Instanzen (verwaltet von pzuschlag/llm-wiki).
+Wiki Lint — quality check for LLM-wiki instances (managed by pzuschlag/llm-wiki).
 
-Konfiguration: wiki.config.yaml im Repo-Root (page_types, review_days, source_prefixes,
-meta_pages, orphan_exempt). Läuft mit Python >= 3.9 ohne Fremdpakete.
+Configuration: wiki.config.yaml at the repo root (page_types, review_days, source_prefixes,
+meta_pages, orphan_exempt). Runs on Python >= 3.9 with no third-party packages.
 
-ERRORS (Exit-Code 1, blockieren den Pre-Commit-Hook):
-  frontmatter   Frontmatter fehlt oder Pflichtfeld fehlt (title, type, last_updated, status, review_by)
-  status        status nicht in {aktuell, entwurf, veraltet, superseded}; superseded ohne superseded_by
-  source-format Quelle in `sources` hat kein gültiges Format (siehe .llm-wiki/CORE.md)
-  broken-link   [[Link]] zeigt auf keine Seite (title-/alias-aware, log.md ausgenommen)
-  orphan        Seite ohne eingehende Links
-  index         index.md verweist auf fehlende Datei, Seite fehlt im Index, oder „Seiten gesamt" stimmt nicht
+ERRORS (exit code 1, block the pre-commit hook):
+  frontmatter   frontmatter missing or a required field is missing (title, type, last_updated, status, review_by)
+  status        status not in {current, draft, outdated, superseded}; superseded without superseded_by
+  source-format a source in `sources` has an invalid format (see .llm-wiki/CORE.md)
+  broken-link   [[Link]] points to no page (title-/alias-aware, log.md exempt)
+  orphan        page with no incoming links
+  index         index.md references a missing file, a page is missing from the index, or "Total pages" is wrong
 
-WARNINGS (Report, blockieren nicht; --strict macht sie zu Errors):
-  no-source     keine Quellen
-  wiki-only     nur Wiki-Seiten als Quelle (keine Primärquelle)
-  vague-source  `note:`-Quelle — präzisieren, wenn möglich
-  stale         review_by überschritten
-  ambiguous     Dateiname existiert in mehreren Ordnern ([[name]] ist mehrdeutig)
-  unknown-type  `type` nicht in wiki.config.yaml → page_types
-  tracked-ignored  Datei ist getrackt, obwohl .gitignore sie ausschließt (Compliance)
+WARNINGS (reported, don't block; --strict turns them into errors):
+  no-source     no sources
+  wiki-only     only wiki pages as a source (no primary source)
+  vague-source  `note:` source — make it more specific if possible
+  stale         review_by has passed
+  ambiguous     filename exists in multiple folders ([[name]] is ambiguous)
+  unknown-type  `type` not in wiki.config.yaml → page_types
+  tracked-ignored  file is tracked even though .gitignore excludes it (compliance)
 
-Link-Auflösung ist title-/alias-aware: [[Anzeigename]] wird gegen Dateiname,
-Frontmatter-`title` UND `aliases` aufgelöst (Obsidian-kompatibel). Section-Anker
-(`#...`) und Alias-Pipe (`|Anzeigetext`) werden vor dem Matchen abgeschnitten.
+Link resolution is title-/alias-aware: [[Display Name]] is resolved against the
+filename, frontmatter `title`, AND `aliases` (Obsidian-compatible). Section anchors
+(`#...`) and the alias pipe (`|Display Text`) are stripped before matching.
 
 Usage:
-  python3 .llm-wiki/lint_wiki.py            # voller Report
-  python3 .llm-wiki/lint_wiki.py --strict   # Warnings zählen als Errors
-  python3 .llm-wiki/lint_wiki.py --stale    # nur Staleness-Report (für Session-Start)
-  python3 .llm-wiki/lint_wiki.py --stats    # Konsultationsrate aus .llm-wiki/.stats.jsonl (siehe log_wiki_access.py)
+  python3 .llm-wiki/lint_wiki.py            # full report
+  python3 .llm-wiki/lint_wiki.py --strict   # warnings count as errors
+  python3 .llm-wiki/lint_wiki.py --stale    # staleness report only (for session start)
+  python3 .llm-wiki/lint_wiki.py --stats    # consultation rate from .llm-wiki/.stats.jsonl (see log_wiki_access.py)
 """
 from __future__ import annotations
 
@@ -47,7 +47,7 @@ STATS_PATH = REPO_ROOT / ".llm-wiki" / ".stats.jsonl"
 TODAY = datetime.date.today()
 
 CONFIG_PATH = REPO_ROOT / "wiki.config.yaml"
-LIFECYCLE = {"aktuell", "entwurf", "veraltet", "superseded"}
+LIFECYCLE = {"current", "draft", "outdated", "superseded"}
 REQUIRED_FRONTMATTER = ["title", "type", "last_updated", "status", "review_by"]
 CORE_SOURCE_FORMATS = (
     r"^(raw/|wiki/|scripts/)\S"
@@ -65,8 +65,8 @@ DEFAULT_CONFIG = {
 
 
 def load_config(path: Path = CONFIG_PATH) -> dict:
-    """Minimaler YAML-Leser für wiki.config.yaml: `key: value`, `key: [a, b]`,
-    und eine Ebene eingerückter `sub: value`-Paare. Kommentare mit #."""
+    """Minimal YAML reader for wiki.config.yaml: `key: value`, `key: [a, b]`,
+    and one level of indented `sub: value` pairs. Comments with #."""
     cfg = {k: (list(v) if isinstance(v, list) else dict(v)) for k, v in DEFAULT_CONFIG.items()}
     if not path.exists():
         return cfg
@@ -96,7 +96,7 @@ def load_config(path: Path = CONFIG_PATH) -> dict:
 # ── Parsing ──────────────────────────────────────────────────────────────────
 
 def normalize(name: str) -> str:
-    """Link-/Titel-String → Vergleichsschlüssel: lowercase, Sonderzeichen weg, Whitespace → Bindestrich."""
+    """Link/title string → comparison key: lowercase, strip special characters, whitespace → hyphen."""
     name = name.strip().lower()
     name = re.sub(r"[^\w\s-]", "", name, flags=re.UNICODE)
     name = re.sub(r"[\s_]+", "-", name).strip("-")
@@ -104,7 +104,7 @@ def normalize(name: str) -> str:
 
 
 def clean_link_target(link: str) -> str:
-    """[[Datei#Section|Anzeigetext]] → 'Datei'. Der `/` bleibt erhalten (kann Teil eines Titels sein)."""
+    """[[File#Section|Display Text]] → 'File'. The `/` is kept (can be part of a title)."""
     return link.split("|", 1)[0].split("#", 1)[0].strip()
 
 
@@ -118,7 +118,7 @@ def frontmatter_block(content: str) -> str | None:
 
 
 def parse_frontmatter(content: str) -> dict:
-    """Einfaches Key/Value-Parsing (eine Zeile pro Key)."""
+    """Simple key/value parsing (one line per key)."""
     block = frontmatter_block(content)
     if block is None:
         return {}
@@ -131,7 +131,7 @@ def parse_frontmatter(content: str) -> dict:
 
 
 def parse_list(value: str) -> list[str]:
-    """Inline-Liste [a, "b, c"] → ['a', 'b, c'] (respektiert Quotes)."""
+    """Inline list [a, "b, c"] → ['a', 'b, c'] (respects quotes)."""
     v = value.strip()
     if v.startswith("[") and v.endswith("]"):
         v = v[1:-1]
@@ -140,7 +140,7 @@ def parse_list(value: str) -> list[str]:
 
 
 def extract_list_field(content: str, key: str) -> list[str]:
-    """Liest eine Liste aus dem Frontmatter — Inline `[a, b]` oder Block (- a / - b)."""
+    """Reads a list from the frontmatter — inline `[a, b]` or block (- a / - b)."""
     block = frontmatter_block(content)
     if block is None:
         return []
@@ -191,7 +191,7 @@ class Report:
 
 
 def load_pages() -> dict[str, dict]:
-    """{rel_path: {path, content, fm}} für alle Wiki-Seiten."""
+    """{rel_path: {path, content, fm}} for all wiki pages."""
     pages = {}
     for f in sorted(WIKI_DIR.rglob("*.md")):
         rel = f.relative_to(WIKI_DIR).as_posix()
@@ -201,13 +201,13 @@ def load_pages() -> dict[str, dict]:
 
 
 def build_name_map(pages: dict) -> tuple[dict[str, str], dict[str, list[str]]]:
-    """{normalisierter Name → rel_path} für Dateiname, title, aliases; plus mehrdeutige Dateinamen."""
+    """{normalized name → rel_path} for filename, title, aliases; plus ambiguous filenames."""
     name_map: dict[str, str] = {}
     by_stem: dict[str, list[str]] = {}
-    # Vorrang: Pfad, title und aliases vor Dateinamen — sonst schluckt z. B.
-    # concepts/google-css.md den Link [[Google CSS]], der products/google-css.md meint.
+    # Precedence: path, title and aliases before filename — otherwise e.g.
+    # concepts/google-css.md would swallow the link [[Google CSS]] that means products/google-css.md.
     for rel, p in pages.items():
-        names = {rel[:-3]}  # auch [[products/google-css]]
+        names = {rel[:-3]}  # also [[products/google-css]]
         title = p["fm"].get("title", "").strip().strip("\"'")
         if title:
             names.add(title)
@@ -236,37 +236,37 @@ def check_page(rel: str, p: dict, r: Report):
 
     ptype = fm.get("type", "").strip("\"' ")
     if CONFIG["page_types"] and ptype and ptype not in CONFIG["page_types"]:
-        r.warn("unknown-type", f"{rel}: type '{ptype}' nicht in wiki.config.yaml → page_types")
+        r.warn("unknown-type", f"{rel}: type '{ptype}' not in wiki.config.yaml → page_types")
 
     status = fm.get("status", "").strip("\"' ")
     if status and status not in LIFECYCLE:
-        r.error("status", f"{rel}: status '{status}' ungültig ({' | '.join(sorted(LIFECYCLE))})")
+        r.error("status", f"{rel}: status '{status}' invalid ({' | '.join(sorted(LIFECYCLE))})")
     if status == "superseded" and not fm.get("superseded_by", "").strip("\"' "):
-        r.error("status", f"{rel}: status superseded ohne superseded_by")
+        r.error("status", f"{rel}: status superseded without superseded_by")
 
     sources = extract_list_field(p["content"], "sources")
     for s in sources:
         if not SOURCE_FORMATS.match(s):
-            r.error("source-format", f"{rel}: ungültiges Quellen-Format '{s}'")
+            r.error("source-format", f"{rel}: invalid source format '{s}'")
     if fm.get("type", "") in {"meta", "template"}:
         pass
     elif not sources:
-        r.warn("no-source", f"{rel}: keine Quellen")
+        r.warn("no-source", f"{rel}: no sources")
     elif all(s.startswith("wiki/") for s in sources):
-        r.warn("wiki-only", f"{rel}: nur Wiki-Seiten als Quelle")
+        r.warn("wiki-only", f"{rel}: only wiki pages as a source")
     for s in sources:
         if s.startswith("note:"):
             r.warn("vague-source", f"{rel}: '{s}'")
 
     review_by = parse_date(fm.get("review_by", ""))
     if review_by and review_by < TODAY and status != "superseded":
-        r.warn("stale", f"{rel}: review_by {review_by} ({(TODAY - review_by).days} T. überfällig)")
+        r.warn("stale", f"{rel}: review_by {review_by} ({(TODAY - review_by).days} d. overdue)")
 
 
 def check_links(pages: dict, name_map: dict, r: Report):
     incoming: dict[str, set] = {rel: set() for rel in pages}
     for rel, p in pages.items():
-        is_history = Path(rel).name == "log.md"  # append-only, alte Links dürfen veralten
+        is_history = Path(rel).name == "log.md"  # append-only, old links are allowed to go stale
         for link in extract_links(p["content"]):
             target = clean_link_target(link)
             if not target:
@@ -297,14 +297,14 @@ def check_index(pages: dict, r: Report):
     catalog = [rel for rel in pages if Path(rel).name not in META_PAGES]
     for rel in catalog:
         if rel not in linked:
-            r.error("index", f"{rel}: fehlt in index.md")
-    m = re.search(r"Seiten gesamt\*\*:\s*(\d+)", content)
+            r.error("index", f"{rel}: missing from index.md")
+    m = re.search(r"Total pages\*\*:\s*(\d+)", content)
     if m and int(m.group(1)) != len(catalog):
-        r.error("index", f"index.md: „Seiten gesamt: {m.group(1)}“, tatsächlich {len(catalog)}")
+        r.error("index", f"index.md: \"Total pages: {m.group(1)}\", actually {len(catalog)}")
 
 
 def check_tracked_ignored(r: Report):
-    """Compliance: getrackte Dateien, die .gitignore ausschließt (z. B. Rohdaten vor der Ignore-Regel committet)."""
+    """Compliance: tracked files that .gitignore excludes (e.g. raw data committed before the ignore rule)."""
     try:
         out = subprocess.run(
             ["git", "-C", str(REPO_ROOT), "ls-files", "-ci", "--exclude-standard"],
@@ -317,7 +317,7 @@ def check_tracked_ignored(r: Report):
     files = [f for f in out.stdout.splitlines() if f.strip()]
     if files:
         dirs = sorted({f.split("/")[0] + ("/" + f.split("/")[1] if f.count("/") > 1 else "") for f in files})
-        r.warn("tracked-ignored", f"{len(files)} Datei(en) getrackt trotz .gitignore: {', '.join(dirs[:8])}"
+        r.warn("tracked-ignored", f"{len(files)} file(s) tracked despite .gitignore: {', '.join(dirs[:8])}"
                + (" …" if len(dirs) > 8 else "") + " → git rm --cached")
 
 
@@ -334,16 +334,16 @@ def print_group(title: str, items: list[tuple[str, str]]):
 
 def print_stale(r: Report):
     stale = [m for k, m in r.warnings if k == "stale"]
-    stale.sort(key=lambda m: -int(re.search(r"\((\d+) T\.", m).group(1)))
-    print(f"Staleness-Report — {len(stale)} Seite(n) mit überschrittenem review_by")
+    stale.sort(key=lambda m: -int(re.search(r"\((\d+) d\.", m).group(1)))
+    print(f"Staleness report — {len(stale)} page(s) past review_by")
     for m in stale:
         print(f"  {m}")
 
 
 def print_stats():
-    """Konsultationsrate aus .llm-wiki/.stats.jsonl (von log_wiki_access.py, PostToolUse-Hook)."""
+    """Consultation rate from .llm-wiki/.stats.jsonl (written by log_wiki_access.py, PostToolUse hook)."""
     if not STATS_PATH.exists():
-        print("Keine Konsultations-Daten (.llm-wiki/.stats.jsonl fehlt — Hook noch nicht gelaufen).")
+        print("No consultation data (.llm-wiki/.stats.jsonl missing — hook hasn't run yet).")
         return
     entries = []
     for line in STATS_PATH.read_text(encoding="utf-8").splitlines():
@@ -355,7 +355,7 @@ def print_stats():
         except json.JSONDecodeError:
             continue
     if not entries:
-        print("Konsultations-Log leer.")
+        print("Consultation log is empty.")
         return
     now = datetime.datetime.now()
     by_path: dict[str, int] = {}
@@ -371,8 +371,8 @@ def print_stats():
             last_7d += 1
         if age <= 30:
             last_30d += 1
-    print(f"Konsultationsrate — {len(entries)} Reads/Greps auf wiki/** insgesamt "
-          f"({last_7d} in 7 T., {last_30d} in 30 T.)")
+    print(f"Consultation rate — {len(entries)} reads/greps on wiki/** total "
+          f"({last_7d} in last 7d, {last_30d} in last 30d)")
     for path, count in sorted(by_path.items(), key=lambda kv: -kv[1])[:10]:
         print(f"  {count:>4}  {path}")
 

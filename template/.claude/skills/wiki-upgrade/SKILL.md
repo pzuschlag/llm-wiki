@@ -1,16 +1,16 @@
 ---
 name: wiki-upgrade
-description: Diese Wiki-Instanz auf eine neue Version des LLM-Wiki-Konzepts (pzuschlag/llm-wiki) heben — per copier update auf einem Branch, mit Migrationen, Lint und Pull Request. Verwenden, wenn eine neue Konzept-Version erschienen ist oder auf Nachfrage.
+description: Lift this wiki instance to a new version of the LLM-wiki concept (pzuschlag/llm-wiki) — via copier update on a branch, with migrations, lint, and a pull request. Use when a new concept version has been released, or on request.
 ---
-<!-- Verwaltet von pzuschlag/llm-wiki — in Instanzen nicht ändern. -->
+<!-- Managed by pzuschlag/llm-wiki — do not change in instances. -->
 
-# Upgrade auf neue Konzept-Version
+# Upgrade to a new concept version
 
-1. **Stand prüfen**: `git status` muss sauber sein. Installierte Version: `_commit` in `.copier-answers.yml`. Verfügbare Versionen: `git ls-remote --tags https://github.com/pzuschlag/llm-wiki`.
-2. **Changelog lesen**: `CHANGELOG.md` im Konzept-Repo zwischen installierter und Zielversion; MAJOR-Versionen (Migrationen, manuelle Schritte) dem Menschen vorab zusammenfassen.
+1. **Check status**: `git status` must be clean. Installed version: `_commit` in `.copier-answers.yml`. Available versions: `git ls-remote --tags https://github.com/pzuschlag/llm-wiki`.
+2. **Read the changelog**: `CHANGELOG.md` in the concept repo, between the installed and target version; summarize MAJOR versions (migrations, manual steps) for the human up front.
 3. **Branch**: `git checkout -b llm-wiki-upgrade-<version>`.
-4. **Update**: `copier update --skip-answered --vcs-ref <tag>` (Copier ≥ 9, `pipx install copier`). Copier führt einen 3-Wege-Merge aus und startet registrierte Migrationen.
-5. **Konflikte**: Konfliktmarker in verwalteten Dateien (`.llm-wiki/`, `.claude/skills/wiki-*`) zugunsten der neuen Version lösen — dort gibt es keine legitimen lokalen Änderungen. Instanz-Dateien (`CLAUDE.md`, `wiki.config.yaml`, `wiki/`) überschreibt Copier nicht; neue Pflicht-Einträge aus dem Changelog dort von Hand ergänzen.
-6. **Prüfen**: `python3 .llm-wiki/lint_wiki.py` ohne Errors; Hook aktiv (`git config core.hooksPath` → `.llm-wiki/hooks`).
-7. **Log**: `## [YYYY-MM-DD] upgrade | llm-wiki <alt> → <neu>` mit den Änderungen aus dem Changelog.
-8. **Commit + Pull Request** zum Review — nie direkt auf main.
+4. **Update**: `copier update --skip-answered --vcs-ref <tag>` (Copier ≥ 9, `pipx install copier`). Copier runs a 3-way merge and triggers registered migrations.
+5. **Conflicts**: resolve conflict markers in managed files (`.llm-wiki/`, `.claude/skills/wiki-*`) in favor of the new version — there are no legitimate local changes there. Copier doesn't overwrite instance files (`CLAUDE.md`, `wiki.config.yaml`, `wiki/`); add any new required entries from the changelog there by hand.
+6. **Verify**: `python3 .llm-wiki/lint_wiki.py` with no errors; hook active (`git config core.hooksPath` → `.llm-wiki/hooks`).
+7. **Log**: `## [YYYY-MM-DD] upgrade | llm-wiki <old> → <new>` with the changes from the changelog.
+8. **Commit + pull request** for review — never directly on main.

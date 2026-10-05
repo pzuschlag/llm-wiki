@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
-# Verwaltet von pzuschlag/llm-wiki.
-# Blockiert Commits mit Wiki-Lint-Errors (Warnings blockieren nicht).
-# Läuft nur, wenn wiki/*.md gestaged ist — Auto-Commits anderer Dateien bleiben unberührt.
-# Aktivieren (einmalig pro Clone):  git config core.hooksPath .llm-wiki/hooks
-# Notfalls überspringen:            git commit --no-verify
+# Managed by pzuschlag/llm-wiki.
+# Blocks commits that have wiki-lint errors (warnings do not block).
+# Only runs when wiki/*.md is staged — auto-commits of other files are unaffected.
+# Enable (once per clone):  git config core.hooksPath .llm-wiki/hooks
+# Skip in an emergency:     git commit --no-verify
 set -euo pipefail
 git diff --cached --name-only --diff-filter=ACMR | grep -q '^wiki/.*\.md$' || exit 0
 REPO="$(git rev-parse --show-toplevel)"
 if ! out="$(python3 "$REPO/.llm-wiki/lint_wiki.py" 2>&1)"; then
   echo "$out" | sed -n '/^ERROR/,/^$/p'
-  echo "❌ Wiki-Lint: Errors gefunden — Commit abgebrochen (Details: python3 .llm-wiki/lint_wiki.py)"
+  echo "❌ Wiki Lint: errors found — commit aborted (details: python3 .llm-wiki/lint_wiki.py)"
   exit 1
 fi

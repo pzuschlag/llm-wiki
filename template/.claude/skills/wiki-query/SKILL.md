@@ -1,16 +1,16 @@
 ---
 name: wiki-query
-description: Frage aus dem LLM-Wiki beantworten — über Index und Seiten, mit Seitenreferenzen und Hinweis auf veraltete Seiten. Verwenden bei Fragen zu Entities, Entscheidungen oder Zusammenhängen dieser Wiki-Domäne.
+description: Answer a question from the LLM wiki — via the index and pages, with page references and a note on outdated pages. Use for questions about entities, decisions, or relationships in this wiki domain.
 ---
-<!-- Verwaltet von pzuschlag/llm-wiki — in Instanzen nicht ändern. -->
+<!-- Managed by pzuschlag/llm-wiki — do not change in instances. -->
 
 # Query
 
-1. `wiki/index.md` lesen → relevante Seiten bestimmen. Bei Bedarf zusätzlich `grep -ril "<begriff>" wiki/`.
-2. Seiten lesen. Für jede genutzte Seite `status` und `review_by` prüfen.
-3. Antwort synthetisieren:
-   - mit Seitenreferenzen (`wiki/projects/x.md`) und, wo vorhanden, den Inline-Quellen
-   - veraltete/superseded Seiten oder überschrittenes `review_by` ausdrücklich nennen und die Primärquelle prüfen
-   - Lücken offen benennen statt aus dem Gedächtnis zu ergänzen
-4. Ist die Antwort dauerhaft wertvoll (Synthese über mehrere Seiten, wiederkehrende Frage) → als neue Seite speichern (Index, Querverweise).
-5. Log: `## [YYYY-MM-DD] query | <Fragestellung>`.
+1. Read `wiki/index.md` → identify relevant pages. If needed, also `grep -ril "<term>" wiki/`.
+2. Read the pages. For every page used, check `status` and `review_by`.
+3. Synthesize the answer:
+   - with page references (`wiki/projects/x.md`) and, where available, the inline sources
+   - call out outdated/superseded pages or a passed `review_by` explicitly, and check the primary source
+   - name gaps openly instead of filling them from memory
+4. If the answer is durably valuable (synthesis across multiple pages, a recurring question) → save it as a new page (index, cross-links).
+5. Log: `## [YYYY-MM-DD] query | <question>`.

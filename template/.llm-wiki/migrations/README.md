@@ -1,9 +1,9 @@
-# Migrationen
+# Migrations
 
-Datenmigrationen zwischen Konzept-Versionen. Verwaltet von `pzuschlag/llm-wiki`.
+Data migrations between concept versions. Managed by `pzuschlag/llm-wiki`.
 
-- Ein Skript pro Änderung: `NNNN_<kurzname>.py`, **idempotent** (zweiter Lauf ändert nichts), Python ≥ 3.9 ohne Fremdpakete, `--dry-run` unterstützen.
-- Registriert in `copier.yml` → `_migrations` des Konzept-Repos mit der Version, ab der es gilt. `copier update` führt es aus, wenn eine Instanz diese Version überspringt.
-- Nach jeder Migration: `python3 .llm-wiki/lint_wiki.py` muss ohne Errors durchlaufen.
+- One script per change: `NNNN_<short-name>.py`, **idempotent** (a second run changes nothing), Python ≥ 3.9 with no third-party packages, support `--dry-run`.
+- Registered in the concept repo's `copier.yml` → `_migrations`, with the version it applies from. `copier update` runs it when an instance skips past that version.
+- After every migration: `python3 .llm-wiki/lint_wiki.py` must pass with no errors.
 
-Muster: Parser für das Frontmatter, Normalisierung je Feld, Schreiben nur bei Änderung, Zähler „Changed: N pages“ als Ausgabe.
+Pattern: parse the frontmatter, normalize per field, write only on change, print a "Changed: N pages" counter.

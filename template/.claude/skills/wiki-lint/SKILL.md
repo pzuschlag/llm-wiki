@@ -1,19 +1,19 @@
 ---
 name: wiki-lint
-description: Gesundheitscheck des LLM-Wikis — mechanischer Lint plus inhaltliche Prüfung auf Widersprüche, veraltete Aussagen und fehlende Seiten. Verwenden auf Nachfrage oder regelmäßig (z. B. wöchentlich).
+description: Health check for the LLM wiki — mechanical lint plus a content review for contradictions, outdated statements, and missing pages. Use on request or regularly (e.g. weekly).
 ---
-<!-- Verwaltet von pzuschlag/llm-wiki — in Instanzen nicht ändern. -->
+<!-- Managed by pzuschlag/llm-wiki — do not change in instances. -->
 
 # Lint
 
-1. `python3 .llm-wiki/lint_wiki.py` ausführen.
-   - **Errors** sofort beheben (Frontmatter, Status, Quellen-Format, Links, Orphans, Index).
-   - **Warnings** als Arbeitsvorrat melden, gruppiert: überfällige Seiten (`stale`), fehlende/vage Quellen, mehrdeutige Dateinamen, getrackte ignorierte Dateien (`tracked-ignored` → Compliance, Mensch informieren).
-2. `python3 .llm-wiki/lint_wiki.py --stats` ausführen (Konsultationsrate aus `.llm-wiki/.stats.jsonl`, falls vorhanden) und kurz einordnen: liest der Agent Wiki-Seiten mitten in Aufgaben, oder nur am Session-Start?
-3. Inhaltlich prüfen (Stichprobe, Fokus auf zuletzt geänderte und überfällige Seiten):
-   - Widersprüche zwischen Seiten (gleiche Entity, unterschiedliche Fakten)
-   - Aussagen, die neuere Quellen überholt haben
-   - wichtige Begriffe ohne eigene Seite; fehlende Querverweise
-   - Append-only-Dateien (`log.md`, Meeting-Sammlungen) über ~25k Tokens → Archivierung vorschlagen (`wiki/archive/YYYY-Qn/`)
-4. Ausgabe: Liste konkreter Vorschläge (Seite, Problem, Vorschlag). Änderungen erst nach Freigabe.
-5. Log: `## [YYYY-MM-DD] lint | <Kurzfazit>`.
+1. Run `python3 .llm-wiki/lint_wiki.py`.
+   - Fix **errors** immediately (frontmatter, status, source format, links, orphans, index).
+   - Report **warnings** as a backlog, grouped: overdue pages (`stale`), missing/vague sources, ambiguous filenames, tracked-but-ignored files (`tracked-ignored` → compliance, inform the human).
+2. Run `python3 .llm-wiki/lint_wiki.py --stats` (consultation rate from `.llm-wiki/.stats.jsonl`, if present) and briefly assess: does the agent read wiki pages mid-task, or only at session start?
+3. Content review (sample, focus on recently changed and overdue pages):
+   - contradictions between pages (same entity, different facts)
+   - statements overtaken by newer sources
+   - important terms with no page of their own; missing cross-links
+   - append-only files (`log.md`, meeting collections) over ~25k tokens → suggest archiving (`wiki/archive/YYYY-Qn/`)
+4. Output: a list of concrete suggestions (page, problem, suggestion). Changes only after approval.
+5. Log: `## [YYYY-MM-DD] lint | <summary>`.

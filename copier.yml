@@ -1,9 +1,9 @@
-# Copier-Vorlage für eine LLM-Wiki-Instanz — siehe README.md und CONCEPT.md §6
+# Copier template for an LLM-wiki instance — see README.md and CONCEPT.md §6
 _subdirectory: template
 _min_copier_version: "9.0.0"
 _answers_file: .copier-answers.yml
 
-# Instanz-Eigentum: nur beim ersten copy anlegen, bei update nie überschreiben
+# Instance ownership: only created on the first copy, never overwritten on update
 _skip_if_exists:
   - CLAUDE.md
   - wiki.config.yaml
@@ -12,40 +12,40 @@ _skip_if_exists:
   - wiki/log.md
   - wiki/overview.md
 
-# Datenmigrationen je Konzept-Version (laufen bei `copier update`, wenn die Version übersprungen wird).
-# Beispiel:
-#   - version: v1.0.0
-#     when: "{{ _stage == 'after' }}"
-#     command: python3 .llm-wiki/migrations/0001_beispiel.py
-_migrations: []
+# Data migrations per concept version (run on `copier update` when a version is skipped past).
+_migrations:
+  - version: v0.4.0
+    when: "{{ _stage == 'after' }}"
+    command: python3 .llm-wiki/migrations/0001_status_en.py
 
 wiki_name:
   type: str
-  help: "Name des Wikis (z. B. 'Arbeits-Wiki', 'Privat-Wiki', 'Projekt X')"
+  help: "Name of the wiki (e.g. 'Work Wiki', 'Personal Wiki', 'Project X')"
 
 wiki_purpose:
   type: str
-  help: "Zweck in einem Satz — wessen Wissen, wofür?"
+  help: "Purpose in one sentence — whose knowledge, for what?"
 
 owner_name:
   type: str
-  help: "Dein Name (für Commits und CLAUDE.md)"
+  help: "Your name (for commits and CLAUDE.md)"
 
 git_email:
   type: str
-  help: "E-Mail für Commits in diesem Wiki"
+  help: "Email for commits in this wiki"
 
 language:
   type: str
   choices: [de, en]
-  default: de
+  default: en
+  help: "Content language for this instance's own pages (not yet wired into the template — informational for now)"
 
 extra_source_prefixes:
   type: str
   default: ""
-  help: "Zusätzliche Quellen-Präfixe, kommagetrennt (z. B. 'confluence, jira, notion'). Kern-Präfixe raw/ wiki/ scripts/ url: meeting: note: sind immer dabei."
+  help: "Additional source prefixes, comma-separated (e.g. 'confluence, jira, notion'). Core prefixes raw/ wiki/ scripts/ url: meeting: note: are always included."
 
 sensitive_data_note:
   type: str
-  default: "raw/ bleibt lokal (gitignored)."
-  help: "Was darf nicht ins Repo / ins Wiki? (Compliance-Hinweis für CLAUDE.md)"
+  default: "raw/ stays local (gitignored)."
+  help: "What must not go into the repo / the wiki? (compliance note for CLAUDE.md)"

@@ -1,28 +1,28 @@
 ---
-title: "ADR 0001: Konzept-Verteilung per Copier-Template"
-status: angenommen
+title: "ADR 0001: Concept distribution via a Copier template"
+status: accepted
 date: 2026-10-02
 ---
 
-# ADR 0001: Konzept-Verteilung per Copier-Template
+# ADR 0001: Concept distribution via a Copier template
 
-## Kontext
-Das LLM-Wiki-Konzept soll in mehreren Wikis laufen (Arbeits-Wiki, Privat-Wiki, Projekte). Konzept-Änderungen sollen alle Instanzen erreichen, ohne dass Instanzen ihre domänenspezifischen Anpassungen verlieren. Konzept-Änderungen betreffen oft auch Daten (Beispiel: Frontmatter-Migration `status`/`review_by` im Arbeits-Wiki, ~100 Seiten).
+## Context
+The LLM-wiki concept should run in multiple wikis (work wiki, personal wiki, projects). Concept changes should reach every instance without instances losing their domain-specific customizations. Concept changes often affect data too (example: the frontmatter migration for `status`/`review_by` in the work wiki, ~100 pages).
 
-## Entscheidung
-Das Konzept-Repo enthält ein [Copier](https://copier.readthedocs.io/)-Template. Instanzen entstehen per `copier copy` und übernehmen neue Versionen per `copier update` auf einem Branch mit Pull Request. Versionen sind Git-Tags. Datenmigrationen laufen als Skripte unter `.llm-wiki/migrations/`.
+## Decision
+The concept repo contains a [Copier](https://copier.readthedocs.io/) template. Instances are created via `copier copy` and adopt new versions via `copier update` on a branch with a pull request. Versions are git tags. Data migrations run as scripts under `.llm-wiki/migrations/`.
 
-Dateien unter `.llm-wiki/` und `.claude/skills/wiki-*` sind vom Konzept verwaltet; `CLAUDE.md`, `wiki.config.yaml`, `wiki/` und `raw/` gehören der Instanz (`_skip_if_exists`). Die Instanz-`CLAUDE.md` bindet die Kernregeln per `@.llm-wiki/CORE.md` ein.
+Files under `.llm-wiki/` and `.claude/skills/wiki-*` are managed by the concept; `CLAUDE.md`, `wiki.config.yaml`, `wiki/`, and `raw/` belong to the instance (`_skip_if_exists`). The instance `CLAUDE.md` pulls in the core rules via `@.llm-wiki/CORE.md`.
 
-## Alternativen
-| Option | Warum nicht |
+## Alternatives
+| Option | Why not |
 |---|---|
-| Claude-Code-Plugin | liefert keine immer geladenen Regeln (CLAUDE.md), migriert keine Daten, wird in Cloud-Sessions nicht aus lokalen Einstellungen geladen ([Doku](https://code.claude.com/docs/en/plugins)). Später als Ergänzung möglich. |
-| Git-Submodul | kein Migrationsmechanismus, Updates umständlich, keine Instanz-Anpassung im selben Pfad |
-| Symlink auf lokalen Ordner | nur auf einem Rechner, unversioniert, Änderungen wirken ungeprüft in allen Wikis; externe `@`-Imports brauchen Freigabe |
-| Manuelles Kopieren | driftet auseinander, keine Nachvollziehbarkeit |
+| Claude Code plugin | provides no always-loaded rules (CLAUDE.md), doesn't migrate data, isn't loaded from local settings in cloud sessions ([docs](https://code.claude.com/docs/en/plugins)). Could complement this later. |
+| Git submodule | no migration mechanism, awkward updates, no instance customization in the same path |
+| Symlink to a local folder | only works on one machine, unversioned, changes take effect everywhere unchecked; external `@` imports need approval |
+| Manual copying | drifts apart, no traceability |
 
-## Konsequenzen
-- Copier muss installiert sein (`pipx install copier`).
-- Verwaltete Dateien werden in Instanzen nicht von Hand geändert; Verbesserungen laufen als Issue ins Konzept-Repo.
-- Die Kopie in jeder Instanz macht Kernregeln auch in Cloud-Sessions und auf anderen Rechnern verfügbar.
+## Consequences
+- Copier must be installed (`pipx install copier`).
+- Managed files are never changed by hand in instances; improvements go to the concept repo as an issue.
+- The copy in every instance makes the core rules available in cloud sessions and on other machines too.

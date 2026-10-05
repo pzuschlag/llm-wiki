@@ -1,24 +1,29 @@
 # Changelog
 
-Versionierung nach SemVer:
-- **MAJOR**: Instanzen brauchen eine Datenmigration oder manuelle Schritte
-- **MINOR**: neue Regel, neuer Check, neuer Skill — ohne Datenmigration
-- **PATCH**: Korrekturen, Formulierungen
+Versioned per SemVer:
+- **MAJOR**: instances need a data migration or manual steps
+- **MINOR**: new rule, new check, new skill — no data migration
+- **PATCH**: fixes, wording
+
+## [0.4.0] — 2026-10-05
+
+- **Breaking**: the `status` frontmatter value is now English — `aktuell` → `current`, `entwurf` → `draft`, `veraltet` → `outdated` (`superseded` unchanged). Migration: `template/.llm-wiki/migrations/0001_status_en.py`, idempotent, registered in `copier.yml` → `_migrations`
+- Concept and template fully translated to English (prose, comments, docstrings, CLI output); historical `CHANGELOG.md`/`decisions/`/`research/` entries translated too — originals are in git history. No other functional change.
 
 ## [0.3.0] — 2026-10-05
 
-- Konsultationsrate: PostToolUse-Hook (`template/.llm-wiki/log_wiki_access.py`, registriert in `template/.claude/settings.json`) zählt Read/Grep-Zugriffe auf `wiki/**` während der Aufgabe (lokal, `.llm-wiki/.stats.jsonl`, gitignored); Auswertung über `lint_wiki.py --stats`, eingebunden im Skill `wiki-lint` (löst Issue #3)
+- Consultation rate: a PostToolUse hook (`template/.llm-wiki/log_wiki_access.py`, registered in `template/.claude/settings.json`) counts Read/Grep access to `wiki/**` during a task (local, `.llm-wiki/.stats.jsonl`, gitignored); evaluated via `lint_wiki.py --stats`, wired into the `wiki-lint` skill (resolves issue #3)
 
 ## [0.2.0] — 2026-10-05
 
-- Datenschutz: Instanzen mit sensiblen Inhalten verschlüsseln ganz oder teilweise mit `git-crypt` statt sich auf Sichtbarkeits-Einstellungen zu verlassen; Cloud-Zugriff regelt die Instanz in ihrer `CLAUDE.md` ([ADR 0002](decisions/0002-sensible-daten-git-crypt.md))
+- Data protection: instances with sensitive content encrypt fully or partially with `git-crypt` instead of relying on visibility settings; cloud access is the instance's own call in its `CLAUDE.md` ([ADR 0002](decisions/0002-sensible-daten-git-crypt.md))
 
 ## [0.1.0] — 2026-10-02
 
-Erste Version, abgeleitet aus dem Betrieb eines Arbeits-Wikis und der Analyse des Kommentar-Threads zu Karpathys Gist.
+First version, derived from running a work wiki and from analyzing the comment thread on Karpathy's gist.
 
-- Konzept: Prinzipien, Instanz-Architektur, Seitenschema, Workflows, Verteilung per Copier, Skalierungsstufen, Compliance
-- Seitenschema mit `status`, `review_by`, `superseded_by` und festen Quellen-Präfixen
-- `lint_wiki.py`: Errors/Warnings, konfigurierbar über `wiki.config.yaml`, `--stale`, `--strict`
-- Pre-Commit-Hook (nur bei gestagten `wiki/*.md`)
-- Skills: `wiki-ingest` (mit Widerspruchs-Check), `wiki-query`, `wiki-lint`, `wiki-upgrade`
+- Concept: principles, instance architecture, page schema, workflows, distribution via Copier, scaling tiers, compliance
+- Page schema with `status`, `review_by`, `superseded_by`, and fixed source prefixes
+- `lint_wiki.py`: errors/warnings, configurable via `wiki.config.yaml`, `--stale`, `--strict`
+- Pre-commit hook (only for staged `wiki/*.md`)
+- Skills: `wiki-ingest` (with contradiction check), `wiki-query`, `wiki-lint`, `wiki-upgrade`

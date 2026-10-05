@@ -1,21 +1,21 @@
 ---
 name: wiki-ingest
-description: Neue Quelle (Dokument, Meeting-Notiz, Export) ins LLM-Wiki einarbeiten — inkl. Widerspruchs-Check gegen bestehende Seiten. Verwenden, wenn eine Datei in raw/ liegt oder neue Informationen ins Wiki sollen.
+description: Incorporate a new source (document, meeting note, export) into the LLM wiki — including a contradiction check against existing pages. Use when a file lands in raw/ or new information should go into the wiki.
 ---
-<!-- Verwaltet von pzuschlag/llm-wiki — in Instanzen nicht ändern. -->
+<!-- Managed by pzuschlag/llm-wiki — do not change in instances. -->
 
 # Ingest
 
-1. **Quelle sichten**: Rohdokument liegt in `raw/` (oder einem Sync-Unterordner). Nur lesen, nie ändern.
-2. **Key Takeaways mit dem Menschen klären**: 3–7 Punkte vorschlagen, Bestätigung abwarten. Bei automatischen Syncs reicht eine kurze Zusammenfassung mit j/n.
-3. **Summary-Seite** schreiben (passender `type`, Frontmatter nach `.llm-wiki/CORE.md`), sofern die Quelle eine eigene Seite trägt.
-4. **Widerspruchs-Check** — für jede betroffene Entity-Seite *vor* dem Ändern:
-   - Seite lesen; neue Aussagen gegen bestehende abgleichen: Termine, Zuständigkeiten, Zahlen, Entscheidungen, Status.
-   - **Fakt hat sich geändert** (neuere Quelle, klarer Nachfolger): neue Aussage eintragen, alte nach `## Historie` verschieben — `- YYYY-MM-DD: <alt> → <neu> (<quelle alt> → <quelle neu>)`.
-   - **Quellen widersprechen sich** (unklar, was gilt): `> [!warning] Widerspruch (YYYY-MM-DD): <Quelle A> sagt X, <Quelle B> sagt Y` an der Stelle; Mensch fragen; nichts überschreiben.
-   - **Ganze Seite überholt**: `status: superseded` + `superseded_by`, bzw. `status: veraltet`.
-5. **Entity-Seiten aktualisieren**: Inhalte, Querverweise `[[…]]`, `sources` ergänzen (Präfix-Formate), `last_updated` = heute, `review_by` = heute + `review_days[type]` aus `wiki.config.yaml`. Entscheidungen, Zahlen, Termine, Zusagen mit Inline-Quelle `(<quelle>, YYYY-MM-DD)`.
-6. **Index**: neue Seiten eintragen, „Seiten gesamt" anpassen.
-7. **Log**: `## [YYYY-MM-DD] ingest | <Quelltitel>` mit Stichpunkten; Zeile `Geändert/superseded: …` für jede Änderung aus Schritt 4.
-8. **Overview** anpassen, wenn sich das Gesamtbild ändert.
-9. `python3 .llm-wiki/lint_wiki.py` → Errors beheben → committen (Instanz-Regeln in `CLAUDE.md`).
+1. **Review the source**: the raw document lives in `raw/` (or a sync subfolder). Read only, never modify.
+2. **Clarify key takeaways with the human**: propose 3–7 points, wait for confirmation. For automatic syncs, a short summary with y/n is enough.
+3. **Write a summary page** (matching `type`, frontmatter per `.llm-wiki/CORE.md`), if the source warrants its own page.
+4. **Contradiction check** — for every affected entity page, *before* changing it:
+   - Read the page; compare new statements against existing ones: dates, ownership, numbers, decisions, status.
+   - **Fact has changed** (newer source, clear successor): add the new statement, move the old one to `## History` — `- YYYY-MM-DD: <old> → <new> (<old source> → <new source>)`.
+   - **Sources disagree** (unclear which holds): `> [!warning] Contradiction (YYYY-MM-DD): <source A> says X, <source B> says Y` at that spot; ask the human; overwrite nothing.
+   - **Whole page superseded**: `status: superseded` + `superseded_by`, or `status: outdated` (no successor).
+5. **Update entity pages**: content, cross-links `[[…]]`, add to `sources` (prefix formats), `last_updated` = today, `review_by` = today + `review_days[type]` from `wiki.config.yaml`. Decisions, numbers, dates, commitments get an inline source `(<source>, YYYY-MM-DD)`.
+6. **Index**: register new pages, adjust "Total pages".
+7. **Log**: `## [YYYY-MM-DD] ingest | <source title>` with bullet points; a `Changed/superseded: …` line for each change from step 4.
+8. **Overview**: adjust if the overall picture changes.
+9. `python3 .llm-wiki/lint_wiki.py` → fix errors → commit (instance rules in `CLAUDE.md`).
