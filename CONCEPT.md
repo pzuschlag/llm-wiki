@@ -1,6 +1,6 @@
 ---
 title: "LLM Wiki — Concept"
-version: 0.4.2
+version: 0.4.3
 status: draft
 last_updated: 2026-10-05
 ---
@@ -53,7 +53,7 @@ superseded_by: "[[successor]]"         # required when superseded
 ```
 
 - **Source formats**: core prefixes `raw/`, `wiki/`, `url:`, `meeting:`, `note:`. Domain prefixes (e.g. `confluence:`, `jira:`, `notion:`) are defined by the instance in `wiki.config.yaml`. `wiki/…` alone is not a source; `note:` is a fallback (lint warns).
-- **Review intervals** per type in `wiki.config.yaml` (default: person 60d, project/area 45, concept/decision 180).
+- **Review intervals** per type in `wiki.config.yaml` (default: person 60d, project/area 45, concept/decision 180). Only the type name and this default interval are shared across instances; no fields are mandated per type beyond the universal frontmatter below (decision: [ADR 0003](decisions/0003-narrow-core-page-types.md)).
 - **Page structure**: 1-sentence summary → `##` sections → `[[Links]]` → optional `## History` → optional `## Sources`.
 - **History**: `- YYYY-MM-DD: <old> → <new> (<old source> → <new source>)`.
 - **Contradiction**: `> [!warning] Contradiction (YYYY-MM-DD): <A> says X, <B> says Y`.
@@ -83,7 +83,7 @@ Link resolution: path, `title`, and `aliases` before filename.
 
 **Goal**: concept changes reach every instance, but each instance adopts them deliberately (pull, not push), with review and, where needed, a data migration.
 
-**Central repo `llm-wiki`** (decision: [ADR 0001](decisions/0001-verteilung-per-copier.md)):
+**Central repo `llm-wiki`** (decision: [ADR 0001](decisions/0001-distribution-via-copier.md)):
 
 ```
 llm-wiki/
@@ -145,13 +145,14 @@ Navigating via `index.md` + full-text `grep` holds up as long as the index comfo
 - The concept repo never contains instance content; examples are synthetic.
 - No third-party tools that send content to foreign servers or LLM providers; tools from the community are used as a source of ideas, not installed.
 - Memory sync and auto-commits respect exclusion lists (`.memory-syncignore`, `.gitignore`); lint checks that nothing ignored is tracked.
-- Instances with sensitive content (e.g. health, finances, relationships) encrypt their repo fully or partially with `git-crypt`, instead of relying on the remote's visibility setting alone; whether cloud sessions may access it is the instance's own call in its `CLAUDE.md` (decision: [ADR 0002](decisions/0002-sensible-daten-git-crypt.md)).
+- Instances with sensitive content (e.g. health, finances, relationships) encrypt their repo fully or partially with `git-crypt`, instead of relying on the remote's visibility setting alone; whether cloud sessions may access it is the instance's own call in its `CLAUDE.md` (decision: [ADR 0002](decisions/0002-sensitive-data-git-crypt.md)).
 
 ## 9. Open questions
 
-- Are there page types that are the same across every instance (e.g. `person`), and shared fields for them?
+None currently — see `decisions/` for how earlier questions were resolved.
 
 ## History
+- 2026-10-05: v0.4.3 — §3 clarifies that only the type name and its default review interval are shared across instances, no mandatory fields per type (ADR 0003); resolves the last §9 question.
 - 2026-10-05: v0.4.2 — §6 adds a quarterly review practice for the gist thread (evaluate, don't just log); resolves the second question from §9.
 - 2026-10-05: v0.4.1 — removed `product`/`source-summary` from the default `page_types` (leftover from the work-wiki instance, never part of the documented core set) and genericized a lint comment that used real industry jargon as an example.
 - 2026-10-05: v0.4.0 — `status` frontmatter values translated to English (`current`/`draft`/`outdated`, migration 0001); concept and template fully translated to English.

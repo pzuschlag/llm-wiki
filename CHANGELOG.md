@@ -5,6 +5,10 @@ Versioned per SemVer:
 - **MINOR**: new rule, new check, new skill — no data migration
 - **PATCH**: fixes, wording
 
+## [0.4.3] — 2026-10-05
+
+- Page types stay a narrow shared core — only the type name and its default review interval, no mandatory per-type fields across instances ([ADR 0003](decisions/0003-narrow-core-page-types.md)). Resolves the last §9 question. Renamed `decisions/0001`/`0002` filenames to English for consistency (content was already translated; links updated).
+
 ## [0.4.2] — 2026-10-05
 
 - §6 adds a quarterly practice: re-read the gist thread, evaluate new comments against the current concept, and actively decide whether to act — feeds into the normal "idea/problem → issue → ADR" flow. Resolves the second §9 question (how gist findings regularly flow into `research/`).
@@ -24,7 +28,7 @@ Versioned per SemVer:
 
 ## [0.2.0] — 2026-10-05
 
-- Data protection: instances with sensitive content encrypt fully or partially with `git-crypt` instead of relying on visibility settings; cloud access is the instance's own call in its `CLAUDE.md` ([ADR 0002](decisions/0002-sensible-daten-git-crypt.md))
+- Data protection: instances with sensitive content encrypt fully or partially with `git-crypt` instead of relying on visibility settings; cloud access is the instance's own call in its `CLAUDE.md` ([ADR 0002](decisions/0002-sensitive-data-git-crypt.md))
 
 ## [0.1.0] — 2026-10-02
 
