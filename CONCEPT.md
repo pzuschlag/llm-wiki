@@ -1,6 +1,6 @@
 ---
 title: "LLM Wiki — Concept"
-version: 0.4.1
+version: 0.4.2
 status: draft
 last_updated: 2026-10-05
 ---
@@ -102,8 +102,10 @@ llm-wiki/
 
 **Ownership** is the central rule: files under `.llm-wiki/` and `.claude/skills/wiki-*` belong to the concept and are never changed by hand in instances. `CLAUDE.md`, `wiki/`, `raw/`, instance skills, and `wiki.config.yaml` belong to the instance. The instance `CLAUDE.md` pulls in the core rules via `@.llm-wiki/CORE.md` and only adds domain-specific things.
 
+**Regular review**: every quarter, re-read the gist thread (`research/`) and evaluate new comments against the current concept — not just log them, actively decide whether something should change. Feeds into step 1 below.
+
 **Flow of a concept change**:
-1. An idea/problem comes up (often in an instance) → an issue in the `llm-wiki` repo, possibly an ADR.
+1. An idea/problem comes up (often in an instance, or from the regular review above) → an issue in the `llm-wiki` repo, possibly an ADR.
 2. Implementation in the template + a migration script if data is affected (like `migrate_frontmatter_wq45.py`) → release tag `vX.Y.Z` + changelog.
 3. Per instance: skill `wiki-upgrade` → `copier update` on a branch → migrations run → `lint_wiki.py` → pull request → merge. The installed version lives in `.copier-answers.yml` (`_commit`).
 
@@ -148,9 +150,9 @@ Navigating via `index.md` + full-text `grep` holds up as long as the index comfo
 ## 9. Open questions
 
 - Are there page types that are the same across every instance (e.g. `person`), and shared fields for them?
-- How do findings from the gist thread regularly flow into `research/` (e.g. a monthly review)?
 
 ## History
+- 2026-10-05: v0.4.2 — §6 adds a quarterly review practice for the gist thread (evaluate, don't just log); resolves the second question from §9.
 - 2026-10-05: v0.4.1 — removed `product`/`source-summary` from the default `page_types` (leftover from the work-wiki instance, never part of the documented core set) and genericized a lint comment that used real industry jargon as an example.
 - 2026-10-05: v0.4.0 — `status` frontmatter values translated to English (`current`/`draft`/`outdated`, migration 0001); concept and template fully translated to English.
 - 2026-10-05: v0.3.0 — §4 extended with consultation-rate measurement (PostToolUse hook `log_wiki_access.py`, evaluated in `wiki-lint`); resolves issue #3.

@@ -5,6 +5,10 @@ Versioned per SemVer:
 - **MINOR**: new rule, new check, new skill — no data migration
 - **PATCH**: fixes, wording
 
+## [0.4.2] — 2026-10-05
+
+- §6 adds a quarterly practice: re-read the gist thread, evaluate new comments against the current concept, and actively decide whether to act — feeds into the normal "idea/problem → issue → ADR" flow. Resolves the second §9 question (how gist findings regularly flow into `research/`).
+
 ## [0.4.1] — 2026-10-05
 
 - Removed `product`/`source-summary` from the default `page_types` in `template/wiki.config.yaml.jinja` — leftover from the work-wiki instance that was never part of the documented core set (`area, person, project, decision, concept, draft, meta, template`); instances can still add their own domain-specific types. Genericized a `lint_wiki.py` comment that used real industry jargon as an example.
