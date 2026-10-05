@@ -1,8 +1,8 @@
 ---
 title: "LLM-Wiki — Konzept"
-version: 0.1.0
+version: 0.2.0
 status: entwurf
-last_updated: 2026-10-02
+last_updated: 2026-10-05
 ---
 
 # LLM-Wiki — Konzept
@@ -143,12 +143,13 @@ Die Navigation über `index.md` + Volltext-`grep` trägt, solange der Index bequ
 - Das Konzept-Repo enthält nie Instanz-Inhalte; Beispiele sind synthetisch.
 - Keine Drittanbieter-Tools, die Inhalte an fremde Server oder LLM-Anbieter senden; Tools aus der Community werden als Ideenquelle genutzt, nicht installiert.
 - Memory-Sync und Auto-Commits respektieren Ausschlusslisten (`.memory-syncignore`, `.gitignore`); Lint prüft, dass nichts Ignoriertes getrackt ist.
+- Instanzen mit sensiblen Inhalten (z. B. Gesundheit, Finanzen, Beziehungen) verschlüsseln ihr Repo ganz oder in Teilen mit `git-crypt`, statt sich auf die Sichtbarkeits-Einstellung des Remotes allein zu verlassen; ob Cloud-Sessions zugreifen dürfen, legt die Instanz in ihrer `CLAUDE.md` fest (Entscheidung: [ADR 0002](decisions/0002-sensible-daten-git-crypt.md)).
 
 ## 9. Offene Fragen
 
-- Soll ein Privat-Wiki Personen-Seiten mit sensiblen Inhalten (Gesundheit, Finanzen) führen, und wenn ja, mit welchem Schutz (lokal-only, verschlüsselt)?
 - Gibt es Seitentypen, die über alle Instanzen gleich sind (z. B. `person`), und gemeinsame Felder dafür?
 - Wie fließen Erkenntnisse aus dem Gist-Thread regelmäßig in `research/` (z. B. monatlicher Abgleich)?
 
 ## Historie
+- 2026-10-05: v0.2.0 — §8 ergänzt um Schutz sensibler Inhalte per `git-crypt` (ADR 0002); damit erste Frage aus §9 beantwortet.
 - 2026-10-02: v0.1.0 — Erstentwurf, abgeleitet aus einem Arbeits-Wiki nach der Analyse des Gist-Threads.
