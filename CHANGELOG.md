@@ -5,6 +5,10 @@ Versioned per SemVer:
 - **MINOR**: new rule, new check, new skill — no data migration
 - **PATCH**: fixes, wording
 
+## [0.4.1] — 2026-10-05
+
+- Removed `product`/`source-summary` from the default `page_types` in `template/wiki.config.yaml.jinja` — leftover from the work-wiki instance that was never part of the documented core set (`area, person, project, decision, concept, draft, meta, template`); instances can still add their own domain-specific types. Genericized a `lint_wiki.py` comment that used real industry jargon as an example.
+
 ## [0.4.0] — 2026-10-05
 
 - **Breaking**: the `status` frontmatter value is now English — `aktuell` → `current`, `entwurf` → `draft`, `veraltet` → `outdated` (`superseded` unchanged). Migration: `template/.llm-wiki/migrations/0001_status_en.py`, idempotent, registered in `copier.yml` → `_migrations`

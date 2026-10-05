@@ -205,9 +205,9 @@ def build_name_map(pages: dict) -> tuple[dict[str, str], dict[str, list[str]]]:
     name_map: dict[str, str] = {}
     by_stem: dict[str, list[str]] = {}
     # Precedence: path, title and aliases before filename — otherwise e.g.
-    # concepts/google-css.md would swallow the link [[Google CSS]] that means products/google-css.md.
+    # concepts/dark-mode.md would swallow the link [[Dark Mode]] that means projects/dark-mode.md.
     for rel, p in pages.items():
-        names = {rel[:-3]}  # also [[products/google-css]]
+        names = {rel[:-3]}  # also [[projects/dark-mode]]
         title = p["fm"].get("title", "").strip().strip("\"'")
         if title:
             names.add(title)

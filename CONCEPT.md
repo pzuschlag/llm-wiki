@@ -1,6 +1,6 @@
 ---
 title: "LLM Wiki — Concept"
-version: 0.4.0
+version: 0.4.1
 status: draft
 last_updated: 2026-10-05
 ---
@@ -53,7 +53,7 @@ superseded_by: "[[successor]]"         # required when superseded
 ```
 
 - **Source formats**: core prefixes `raw/`, `wiki/`, `url:`, `meeting:`, `note:`. Domain prefixes (e.g. `confluence:`, `jira:`, `notion:`) are defined by the instance in `wiki.config.yaml`. `wiki/…` alone is not a source; `note:` is a fallback (lint warns).
-- **Review intervals** per type in `wiki.config.yaml` (default: person 60d, project/area 45, product 90, concept/decision 180).
+- **Review intervals** per type in `wiki.config.yaml` (default: person 60d, project/area 45, concept/decision 180).
 - **Page structure**: 1-sentence summary → `##` sections → `[[Links]]` → optional `## History` → optional `## Sources`.
 - **History**: `- YYYY-MM-DD: <old> → <new> (<old source> → <new source>)`.
 - **Contradiction**: `> [!warning] Contradiction (YYYY-MM-DD): <A> says X, <B> says Y`.
@@ -151,6 +151,7 @@ Navigating via `index.md` + full-text `grep` holds up as long as the index comfo
 - How do findings from the gist thread regularly flow into `research/` (e.g. a monthly review)?
 
 ## History
+- 2026-10-05: v0.4.1 — removed `product`/`source-summary` from the default `page_types` (leftover from the work-wiki instance, never part of the documented core set) and genericized a lint comment that used real industry jargon as an example.
 - 2026-10-05: v0.4.0 — `status` frontmatter values translated to English (`current`/`draft`/`outdated`, migration 0001); concept and template fully translated to English.
 - 2026-10-05: v0.3.0 — §4 extended with consultation-rate measurement (PostToolUse hook `log_wiki_access.py`, evaluated in `wiki-lint`); resolves issue #3.
 - 2026-10-05: v0.2.0 — §8 extended with protection for sensitive content via `git-crypt` (ADR 0002); resolves the first question from §9.

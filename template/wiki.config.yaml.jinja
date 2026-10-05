@@ -2,19 +2,17 @@
 # Format: plain YAML (key: value, key: [a, b], one level of indentation for mappings).
 
 # Allowed page types (`type:` in the frontmatter)
-page_types: [area, person, project, product, decision, concept, source-summary, draft, meta, template]
+page_types: [area, person, project, decision, concept, draft, meta, template]
 
 # Review interval in days per type: review_by = last_updated + interval
 review_days:
   person: 60
   project: 45
   area: 45
-  product: 90
   concept: 180
   decision: 180
   meta: 30
   draft: 30
-  source-summary: 365
   template: 365
 
 # Additional source prefixes (`<prefix>:<value>`) alongside the core prefixes
