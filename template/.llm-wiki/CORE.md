@@ -1,5 +1,5 @@
 <!-- Verwaltet von pzuschlag/llm-wiki — in Instanzen NICHT von Hand ändern. Änderungen: Issue im llm-wiki-Repo, dann Skill wiki-upgrade. -->
-# LLM-Wiki — Kernregeln (Konzept v0.1.0)
+# LLM-Wiki — Kernregeln (Konzept v0.3.0)
 
 Dieses Repo ist ein LLM-Wiki: Das LLM kompiliert Rohquellen aus `raw/` in ein persistentes, vernetztes Markdown-Wiki unter `wiki/`. Das Wiki ist die primäre Wissensquelle dieser Domäne.
 
@@ -46,4 +46,6 @@ superseded_by: "[[Nachfolger]]"   # Pflicht bei superseded
 `python3 .llm-wiki/lint_wiki.py` — Errors blockieren Commits (Pre-Commit-Hook, aktivieren mit `git config core.hooksPath .llm-wiki/hooks`), Warnings sind Arbeitsvorrat. `--stale` = nur überfällige Seiten.
 
 ## Verwaltete Dateien
-`.llm-wiki/` und `.claude/skills/wiki-*` gehören dem Konzept-Repo `pzuschlag/llm-wiki` und werden hier nicht geändert. Verbesserungsideen → Issue dort. Instanz-Spezifisches gehört in `CLAUDE.md`, `wiki.config.yaml` oder eigene Skills.
+`.llm-wiki/`, `.claude/skills/wiki-*` und `.claude/settings.json` gehören dem Konzept-Repo `pzuschlag/llm-wiki` und werden hier nicht geändert. Verbesserungsideen → Issue dort. Instanz-Spezifisches gehört in `CLAUDE.md`, `wiki.config.yaml` oder eigene Skills.
+
+`.claude/settings.json` registriert einen PostToolUse-Hook (`log_wiki_access.py`), der Reads/Greps auf `wiki/**` zählt (`.llm-wiki/.stats.jsonl`, lokal) — Konsultationsrate während der Aufgabe, nicht nur am Session-Start. Auswertung: `python3 .llm-wiki/lint_wiki.py --stats`, eingebunden im Skill `wiki-lint`.

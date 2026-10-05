@@ -28,7 +28,8 @@ ANSWERS=(--data wiki_name="Test-Wiki" --data owner_name="Erika Mustermann" --dat
 INST="$WORK/instanz"
 copier copy -q --vcs-ref v0.0.1 "${ANSWERS[@]}" "$TPL" "$INST" >/dev/null
 for f in CLAUDE.md wiki.config.yaml .copier-answers.yml .llm-wiki/CORE.md .llm-wiki/lint_wiki.py \
-         .llm-wiki/hooks/pre-commit .claude/skills/wiki-ingest/SKILL.md wiki/index.md wiki/log.md wiki/overview.md; do
+         .llm-wiki/hooks/pre-commit .llm-wiki/log_wiki_access.py .claude/settings.json \
+         .claude/skills/wiki-ingest/SKILL.md wiki/index.md wiki/log.md wiki/overview.md; do
   [ -e "$INST/$f" ] || fail "copy: $f fehlt"
 done
 grep -q "@.llm-wiki/CORE.md" "$INST/CLAUDE.md" || fail "CLAUDE.md importiert CORE.md nicht"
@@ -73,6 +74,15 @@ git checkout -q HEAD -- wiki/beispiel.md
 ok "hook: ungültige Seite blockiert"
 echo "notiz" > notes.txt && git add notes.txt && git commit -qm "kein wiki" || fail "hook: blockiert Nicht-Wiki-Commit"
 ok "hook: Nicht-Wiki-Commits laufen durch"
+
+# 3b. Konsultations-Hook (PostToolUse): Read auf wiki/ wird gezählt, auf notes.txt nicht
+echo '{"tool_name":"Read","tool_input":{"file_path":"wiki/index.md"},"cwd":"'"$INST"'"}' | python3 .llm-wiki/log_wiki_access.py
+echo '{"tool_name":"Read","tool_input":{"file_path":"notes.txt"},"cwd":"'"$INST"'"}' | python3 .llm-wiki/log_wiki_access.py
+[ -f .llm-wiki/.stats.jsonl ] || fail "hook: .stats.jsonl wurde nicht angelegt"
+[ "$(wc -l < .llm-wiki/.stats.jsonl | tr -d ' ')" = "1" ] || fail "hook: falsche Anzahl Einträge (nur wiki/-Reads zählen)"
+python3 .llm-wiki/lint_wiki.py --stats | grep -q "wiki/index.md" || fail "lint --stats: Eintrag fehlt im Report"
+git check-ignore -q .llm-wiki/.stats.jsonl || fail ".stats.jsonl ist nicht gitignored"
+ok "hook: Konsultations-Log zählt nur wiki/-Reads, --stats wertet aus, Datei ist gitignored"
 
 # 4. Update: Instanz passt CLAUDE.md an, Vorlage ändert CORE.md und CLAUDE.md-Vorlage
 echo "Instanz-spezifische Regel XYZ" >> CLAUDE.md && git commit -qam "instanz-anpassung"

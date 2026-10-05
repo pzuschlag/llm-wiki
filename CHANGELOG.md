@@ -5,6 +5,10 @@ Versionierung nach SemVer:
 - **MINOR**: neue Regel, neuer Check, neuer Skill — ohne Datenmigration
 - **PATCH**: Korrekturen, Formulierungen
 
+## [0.3.0] — 2026-10-05
+
+- Konsultationsrate: PostToolUse-Hook (`template/.llm-wiki/log_wiki_access.py`, registriert in `template/.claude/settings.json`) zählt Read/Grep-Zugriffe auf `wiki/**` während der Aufgabe (lokal, `.llm-wiki/.stats.jsonl`, gitignored); Auswertung über `lint_wiki.py --stats`, eingebunden im Skill `wiki-lint` (löst Issue #3)
+
 ## [0.2.0] — 2026-10-05
 
 - Datenschutz: Instanzen mit sensiblen Inhalten verschlüsseln ganz oder teilweise mit `git-crypt` statt sich auf Sichtbarkeits-Einstellungen zu verlassen; Cloud-Zugriff regelt die Instanz in ihrer `CLAUDE.md` ([ADR 0002](decisions/0002-sensible-daten-git-crypt.md))

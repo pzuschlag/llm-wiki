@@ -30,10 +30,12 @@ Usage:
   python3 .llm-wiki/lint_wiki.py            # voller Report
   python3 .llm-wiki/lint_wiki.py --strict   # Warnings zählen als Errors
   python3 .llm-wiki/lint_wiki.py --stale    # nur Staleness-Report (für Session-Start)
+  python3 .llm-wiki/lint_wiki.py --stats    # Konsultationsrate aus .llm-wiki/.stats.jsonl (siehe log_wiki_access.py)
 """
 from __future__ import annotations
 
 import datetime
+import json
 import re
 import subprocess
 import sys
@@ -41,6 +43,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).parent.parent
 WIKI_DIR = REPO_ROOT / "wiki"
+STATS_PATH = REPO_ROOT / ".llm-wiki" / ".stats.jsonl"
 TODAY = datetime.date.today()
 
 CONFIG_PATH = REPO_ROOT / "wiki.config.yaml"
@@ -337,7 +340,48 @@ def print_stale(r: Report):
         print(f"  {m}")
 
 
+def print_stats():
+    """Konsultationsrate aus .llm-wiki/.stats.jsonl (von log_wiki_access.py, PostToolUse-Hook)."""
+    if not STATS_PATH.exists():
+        print("Keine Konsultations-Daten (.llm-wiki/.stats.jsonl fehlt — Hook noch nicht gelaufen).")
+        return
+    entries = []
+    for line in STATS_PATH.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            entries.append(json.loads(line))
+        except json.JSONDecodeError:
+            continue
+    if not entries:
+        print("Konsultations-Log leer.")
+        return
+    now = datetime.datetime.now()
+    by_path: dict[str, int] = {}
+    last_7d = last_30d = 0
+    for e in entries:
+        by_path[e.get("path", "?")] = by_path.get(e.get("path", "?"), 0) + 1
+        try:
+            ts = datetime.datetime.fromisoformat(e["ts"])
+        except (KeyError, ValueError):
+            continue
+        age = (now - ts).days
+        if age <= 7:
+            last_7d += 1
+        if age <= 30:
+            last_30d += 1
+    print(f"Konsultationsrate — {len(entries)} Reads/Greps auf wiki/** insgesamt "
+          f"({last_7d} in 7 T., {last_30d} in 30 T.)")
+    for path, count in sorted(by_path.items(), key=lambda kv: -kv[1])[:10]:
+        print(f"  {count:>4}  {path}")
+
+
 def run_lint(argv: list[str]) -> int:
+    if "--stats" in argv:
+        print_stats()
+        return 0
+
     pages = load_pages()
     name_map, ambiguous = build_name_map(pages)
     r = Report()

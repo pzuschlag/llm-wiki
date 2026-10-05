@@ -39,8 +39,8 @@ python3 .llm-wiki/lint_wiki.py
 
 | Verwaltet vom Konzept (in Instanzen nicht von Hand ändern) | Gehört der Instanz |
 |---|---|
-| `.llm-wiki/` (CORE.md, lint_wiki.py, hooks/, migrations/) | `CLAUDE.md`, `wiki.config.yaml` |
-| `.claude/skills/wiki-*` | `wiki/`, `raw/`, `scripts/`, eigene Skills |
+| `.llm-wiki/` (CORE.md, lint_wiki.py, log_wiki_access.py, hooks/, migrations/) | `CLAUDE.md`, `wiki.config.yaml` |
+| `.claude/skills/wiki-*`, `.claude/settings.json` | `wiki/`, `raw/`, `scripts/`, eigene Skills |
 
 Verbesserungsideen aus einer Instanz → Issue in diesem Repo, nicht lokal in `.llm-wiki/` ändern.
 

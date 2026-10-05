@@ -1,6 +1,6 @@
 ---
 title: "LLM-Wiki — Konzept"
-version: 0.2.0
+version: 0.3.0
 status: entwurf
 last_updated: 2026-10-05
 ---
@@ -68,7 +68,7 @@ superseded_by: "[[Nachfolger]]"      # Pflicht bei superseded
 
 **Session-Start**: Instanz-Syncs (Skills) → Staleness-Report (`lint_wiki.py --stale`) → Auffrischen anbieten.
 
-**Konsultations-Regeln** (verbindlich in jeder Instanz): vor Aussagen zu Entities zuerst die Seite lesen; Widerspruch zu einer Quelle → Ingest-Check statt Überschreiben; veraltete Seite → in der Antwort sagen.
+**Konsultations-Regeln** (verbindlich in jeder Instanz): vor Aussagen zu Entities zuerst die Seite lesen; Widerspruch zu einer Quelle → Ingest-Check statt Überschreiben; veraltete Seite → in der Antwort sagen. Ob das in der Praxis passiert, misst ein PostToolUse-Hook (`.llm-wiki/log_wiki_access.py` → `.llm-wiki/.stats.jsonl`, lokal); Auswertung über `lint_wiki.py --stats` im Skill `wiki-lint`.
 
 ## 5. Prüfung (Lint)
 
@@ -151,5 +151,6 @@ Die Navigation über `index.md` + Volltext-`grep` trägt, solange der Index bequ
 - Wie fließen Erkenntnisse aus dem Gist-Thread regelmäßig in `research/` (z. B. monatlicher Abgleich)?
 
 ## Historie
+- 2026-10-05: v0.3.0 — §4 ergänzt um Konsultationsrate-Messung (PostToolUse-Hook `log_wiki_access.py`, Auswertung in `wiki-lint`); löst Issue #3.
 - 2026-10-05: v0.2.0 — §8 ergänzt um Schutz sensibler Inhalte per `git-crypt` (ADR 0002); damit erste Frage aus §9 beantwortet.
 - 2026-10-02: v0.1.0 — Erstentwurf, abgeleitet aus einem Arbeits-Wiki nach der Analyse des Gist-Threads.
