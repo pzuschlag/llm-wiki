@@ -1,13 +1,13 @@
 ---
 title: "LLM Wiki — Concept"
-version: 0.4.1
+version: 0.4.2
 status: draft
 last_updated: 2026-10-05
 ---
 
 # LLM Wiki — Concept
 
-An LLM wiki is a persistent, LLM-maintained Markdown wiki that compiles knowledge from raw sources instead of re-deriving it on every question. This document describes one concrete, battle-tested variant of the pattern. It is the central source for every wiki that applies the concept, and is independent of their content.
+An LLM wiki is a persistent, LLM-maintained Markdown wiki that compiles knowledge from raw sources instead of re-deriving it on every question. This document describes one concrete variant of the pattern, in daily use since 04/2026. It is the central source for every wiki that applies the concept, and is independent of their content.
 
 Based on: [Karpathy's LLM-wiki gist](https://gist.github.com/karpathy/442a6bf555914893e9891c11519de94f) (04/2026), extended with findings from the comment thread and from running a work wiki (~100 pages, since 04/2026).
 
@@ -92,19 +92,21 @@ llm-wiki/
 ├── decisions/            # ADRs on the concept
 ├── research/             # notes from the gist thread, other implementations
 ├── template/             # Copier template for an instance
-│   ├── .llm-wiki/        # MANAGED: CORE.md (rules), lint_wiki.py, hooks/pre-commit, migrations/
+│   ├── .llm-wiki/        # MANAGED: CORE.md (rules), lint_wiki.py, log_wiki_access.py,
+│   │                     #          hooks/pre-commit, migrations/ (e.g. 0001_status_en.py)
 │   ├── .claude/skills/wiki-*/   # MANAGED: ingest, query, lint, upgrade
+│   ├── .claude/settings.json    # MANAGED: registers the consultation-rate hook (PostToolUse)
 │   ├── CLAUDE.md.jinja   # created once, then instance-owned; imports @.llm-wiki/CORE.md
 │   ├── wiki.config.yaml.jinja   # instance parameters: types, intervals, source prefixes, language
 │   └── wiki/index.md, log.md, overview.md
 └── copier.yml            # questions, _migrations per version
 ```
 
-**Ownership** is the central rule: files under `.llm-wiki/` and `.claude/skills/wiki-*` belong to the concept and are never changed by hand in instances. `CLAUDE.md`, `wiki/`, `raw/`, instance skills, and `wiki.config.yaml` belong to the instance. The instance `CLAUDE.md` pulls in the core rules via `@.llm-wiki/CORE.md` and only adds domain-specific things.
+**Ownership** is the central rule: files under `.llm-wiki/`, `.claude/skills/wiki-*`, and `.claude/settings.json` belong to the concept and are never changed by hand in instances. `CLAUDE.md`, `wiki/`, `raw/`, instance skills, and `wiki.config.yaml` belong to the instance. The instance `CLAUDE.md` pulls in the core rules via `@.llm-wiki/CORE.md` and only adds domain-specific things.
 
 **Flow of a concept change**:
 1. An idea/problem comes up (often in an instance) → an issue in the `llm-wiki` repo, possibly an ADR.
-2. Implementation in the template + a migration script if data is affected (like `migrate_frontmatter_wq45.py`) → release tag `vX.Y.Z` + changelog.
+2. Implementation in the template + a migration script if data is affected (like `migrations/0001_status_en.py`) → release tag `vX.Y.Z` + changelog.
 3. Per instance: skill `wiki-upgrade` → `copier update` on a branch → migrations run → `lint_wiki.py` → pull request → merge. The installed version lives in `.copier-answers.yml` (`_commit`).
 
 **New instance**: `copier copy gh:pzuschlag/llm-wiki <folder>` → answer the questions → `git config core.hooksPath .llm-wiki/hooks`. Details in the [README](README.md).
@@ -151,6 +153,7 @@ Navigating via `index.md` + full-text `grep` holds up as long as the index comfo
 - How do findings from the gist thread regularly flow into `research/` (e.g. a monthly review)?
 
 ## History
+- 2026-10-05: v0.4.2 — consistency fixes: §6 tree lists `log_wiki_access.py`, `.claude/settings.json`, and the migrations folder; the migration example points to a script that exists in this repo; intro no longer calls the experimental concept "battle-tested".
 - 2026-10-05: v0.4.1 — removed `product`/`source-summary` from the default `page_types` (leftover from the work-wiki instance, never part of the documented core set) and genericized a lint comment that used real industry jargon as an example.
 - 2026-10-05: v0.4.0 — `status` frontmatter values translated to English (`current`/`draft`/`outdated`, migration 0001); concept and template fully translated to English.
 - 2026-10-05: v0.3.0 — §4 extended with consultation-rate measurement (PostToolUse hook `log_wiki_access.py`, evaluated in `wiki-lint`); resolves issue #3.

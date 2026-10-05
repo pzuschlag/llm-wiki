@@ -1,5 +1,5 @@
 <!-- Managed by pzuschlag/llm-wiki — do not change by hand in instances. Changes: file an issue in the llm-wiki repo, then the wiki-upgrade skill. -->
-# LLM Wiki — Core Rules (Concept v0.4.1)
+# LLM Wiki — Core Rules (Concept v0.4.2)
 
 This repo is an LLM wiki: the LLM compiles raw sources from `raw/` into a persistent, cross-linked Markdown wiki under `wiki/`. The wiki is the primary knowledge source for this domain.
 

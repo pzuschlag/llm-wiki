@@ -5,6 +5,10 @@ Versioned per SemVer:
 - **MINOR**: new rule, new check, new skill — no data migration
 - **PATCH**: fixes, wording
 
+## [0.4.2] — 2026-10-05
+
+- `CONCEPT.md` consistency fixes, no functional change: the §6 directory tree now lists `log_wiki_access.py`, `.claude/settings.json`, and `migrations/0001_status_en.py`; the ownership rule names `.claude/settings.json`; the migration example points to `migrations/0001_status_en.py` instead of a script that only exists in an instance; the intro says "in daily use since 04/2026" instead of "battle-tested", matching the v0.x experimental status.
+
 ## [0.4.1] — 2026-10-05
 
 - Removed `product`/`source-summary` from the default `page_types` in `template/wiki.config.yaml.jinja` — leftover from the work-wiki instance that was never part of the documented core set (`area, person, project, decision, concept, draft, meta, template`); instances can still add their own domain-specific types. Genericized a `lint_wiki.py` comment that used real industry jargon as an example.
