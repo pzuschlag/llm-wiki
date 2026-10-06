@@ -111,6 +111,8 @@ llm-wiki/
 
 **New instance**: `copier copy gh:pzuschlag/llm-wiki <folder>` → answer the questions → `git config core.hooksPath .llm-wiki/hooks`. Details in the [README](README.md).
 
+**Staying current**: `.llm-wiki/check_version.py` lets an instance check *itself* against the latest release tag and flag whether catching up looks like a routine patch or likely needs manual migration steps (a `**Breaking**` entry in `CHANGELOG.md` newer than the installed version). It never runs `copier update` on its own — only step 3 above does, with review. An instance wires it into its own local scheduling (cron, a LaunchAgent, whatever) at whatever cadence it likes; the concept doesn't prescribe one, and no instance needs to know about any other instance.
+
 **Why Copier instead of a plugin, submodule, or symlink**
 
 | Option | Pro | Con |

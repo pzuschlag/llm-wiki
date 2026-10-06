@@ -29,8 +29,8 @@ ANSWERS=(--data wiki_name="Test Wiki" --data owner_name="Jane Doe" --data wiki_p
 INST="$WORK/instance"
 copier copy -q --vcs-ref v0.0.1 "${ANSWERS[@]}" "$TPL" "$INST" >/dev/null
 for f in CLAUDE.md wiki.config.yaml .copier-answers.yml .llm-wiki/CORE.md .llm-wiki/lint_wiki.py \
-         .llm-wiki/hooks/pre-commit .llm-wiki/log_wiki_access.py .claude/settings.json \
-         .claude/skills/wiki-ingest/SKILL.md wiki/index.md wiki/log.md wiki/overview.md; do
+         .llm-wiki/check_version.py .llm-wiki/hooks/pre-commit .llm-wiki/log_wiki_access.py \
+         .claude/settings.json .claude/skills/wiki-ingest/SKILL.md wiki/index.md wiki/log.md wiki/overview.md; do
   [ -e "$INST/$f" ] || fail "copy: $f missing"
 done
 grep -q "@.llm-wiki/CORE.md" "$INST/CLAUDE.md" || fail "CLAUDE.md does not import CORE.md"
@@ -96,11 +96,23 @@ python3 .llm-wiki/lint_wiki.py >/dev/null || fail "lint: errors after migration 
 git checkout -q HEAD -- wiki/example.md
 ok "migration 0001: aktuell/entwurf/veraltet → current/draft/outdated, idempotent"
 
+# 3d. check_version.py: up to date against its own installed tag, no marker
+python3 .llm-wiki/check_version.py --force | grep -q "up to date" || fail "check_version: should report up to date against v0.0.1"
+[ ! -f raw/.llm_wiki_upgrade_pending.json ] || fail "check_version: marker should not exist while up to date"
+ok "check_version: up to date, no marker"
+
 # 4. Update: instance customizes CLAUDE.md, template changes CORE.md and the CLAUDE.md template
 echo "Instance-specific rule XYZ" >> CLAUDE.md && git commit -qam "instance customization"
 echo "<!-- New core rule from v0.0.2 -->" >> "$TPL/template/.llm-wiki/CORE.md"
 echo "Template change the instance must NOT receive" >> "$TPL/template/CLAUDE.md.jinja"
 git -C "$TPL" commit -qam "v0.0.2" && git -C "$TPL" tag v0.0.2
+
+# 4a. check_version.py: $TPL (acting as the concept repo) is now ahead — detect it, write the marker, don't re-upgrade here
+python3 .llm-wiki/check_version.py | grep -q "UPGRADE (routine): v0.0.1 -> v0.0.2" || fail "check_version: did not detect v0.0.2 as latest"
+[ -f raw/.llm_wiki_upgrade_pending.json ] || fail "check_version: marker not written when behind"
+grep -q '"latest": "v0.0.2"' raw/.llm_wiki_upgrade_pending.json || fail "check_version: marker has wrong latest version"
+python3 .llm-wiki/check_version.py | grep -q "marker already set" || fail "check_version: should not overwrite an unread marker"
+ok "check_version: detects being behind, writes the marker once"
 copier update -q --skip-answered --defaults --trust --vcs-ref v0.0.2 >/dev/null
 grep -q "New core rule from v0.0.2" .llm-wiki/CORE.md || fail "update: CORE.md not updated"
 grep -q "Instance-specific rule XYZ" CLAUDE.md || fail "update: instance customization in CLAUDE.md was lost"
