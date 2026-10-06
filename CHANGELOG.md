@@ -5,6 +5,10 @@ Versioned per SemVer:
 - **MINOR**: new rule, new check, new skill — no data migration
 - **PATCH**: fixes, wording
 
+## [0.5.0] — 2026-10-06
+
+- `template/.llm-wiki/check_version.py`: an instance can check *itself* against the latest concept release tag and flag whether catching up looks routine or likely needs manual steps (a `**Breaking**` CHANGELOG.md entry newer than the installed version). Doesn't run `copier update` itself — that stays the `wiki-upgrade` skill's job, with review. Self-contained by design: derives the concept repo from its own `.copier-answers.yml` (`_src_path`), no instance needs to know about any other instance. Wiring it into local scheduling (cron, a LaunchAgent, …) is the instance's own call. Prompted by an instance running this check as a hand-rolled script that hardcoded other instances' paths — moved the generic part here instead ([CONCEPT.md §6](CONCEPT.md)).
+
 ## [0.4.3] — 2026-10-05
 
 - Page types stay a narrow shared core — only the type name and its default review interval, no mandatory per-type fields across instances ([ADR 0003](decisions/0003-narrow-core-page-types.md)). Resolves the last §9 question. Renamed `decisions/0001`/`0002` filenames to English for consistency (content was already translated; links updated).

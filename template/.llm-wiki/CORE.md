@@ -1,5 +1,5 @@
 <!-- Managed by pzuschlag/llm-wiki — do not change by hand in instances. Changes: file an issue in the llm-wiki repo, then the wiki-upgrade skill. -->
-# LLM Wiki — Core Rules (Concept v0.4.3)
+# LLM Wiki — Core Rules (Concept v0.5.0)
 
 This repo is an LLM wiki: the LLM compiles raw sources from `raw/` into a persistent, cross-linked Markdown wiki under `wiki/`. The wiki is the primary knowledge source for this domain.
 
@@ -45,6 +45,8 @@ superseded_by: "[[successor]]"   # required when superseded
 
 ## Checking
 `python3 .llm-wiki/lint_wiki.py` — errors block commits (pre-commit hook, enable with `git config core.hooksPath .llm-wiki/hooks`), warnings are a backlog. `--stale` = overdue pages only.
+
+`python3 .llm-wiki/check_version.py` — checks this instance against the latest concept release, flags whether a `**Breaking**` CHANGELOG.md entry is involved, and writes `raw/.llm_wiki_upgrade_pending.json` when behind. Doesn't upgrade itself (that's the `wiki-upgrade` skill); wire it into your own local scheduling at whatever cadence you like.
 
 ## Managed files
 `.llm-wiki/`, `.claude/skills/wiki-*`, and `.claude/settings.json` belong to the concept repo `pzuschlag/llm-wiki` and are not changed here. Improvement ideas → file an issue there. Instance-specific things belong in `CLAUDE.md`, `wiki.config.yaml`, or your own skills.
